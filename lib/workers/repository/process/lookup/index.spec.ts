@@ -1699,6 +1699,34 @@ describe('workers/repository/process/lookup/index', () => {
       expect(res).toMatchSnapshot();
     });
 
+    it('handles replacements for invalid old values', async () => {
+      config.currentValue = 'feat/1.4.1';
+      config.depName = 'q';
+      // This config is normally set when packageRules are applied
+      config.replacementName = 'r';
+      config.replacementVersion = '2.0.0';
+      config.updateType = 'replacement';
+      config.datasource = NpmDatasource.id;
+      config.packageFile = 'package.json';
+      httpMock.scope('https://registry.npmjs.org').get('/q').reply(200, qJson);
+      const res = await lookup.lookupUpdates(config);
+      expect(res).toMatchSnapshot();
+    });
+
+    it('handles not found replacements for invalid old values', async () => {
+      config.currentValue = 'feat/1.4.1';
+      config.depName = 'x';
+      // This config is normally set when packageRules are applied
+      config.replacementName = 'r';
+      config.replacementVersion = '2.0.0';
+      config.updateType = 'replacement';
+      config.datasource = NpmDatasource.id;
+      config.packageFile = 'package.json';
+      httpMock.scope('https://registry.npmjs.org').get('/x').reply(404);
+      const res = await lookup.lookupUpdates(config);
+      expect(res).toMatchSnapshot();
+    });
+
     it('rollback for invalid version to last stable version', async () => {
       config.currentValue = '2.5.17';
       config.depName = 'vue';

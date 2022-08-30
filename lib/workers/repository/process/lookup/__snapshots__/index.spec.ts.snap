@@ -194,6 +194,19 @@ exports[`workers/repository/process/lookup/index .lookupUpdates() handles git su
 
 exports[`workers/repository/process/lookup/index .lookupUpdates() handles github 404 1`] = `[]`;
 
+exports[`workers/repository/process/lookup/index .lookupUpdates() handles not found replacements for invalid old values 1`] = `
+{
+  "updates": [],
+  "versioning": "npm",
+  "warnings": [
+    {
+      "message": "Failed to look up dependency x",
+      "topic": "x",
+    },
+  ],
+}
+`;
+
 exports[`workers/repository/process/lookup/index .lookupUpdates() handles packagist 1`] = `[]`;
 
 exports[`workers/repository/process/lookup/index .lookupUpdates() handles pypi 404 1`] = `[]`;
@@ -210,6 +223,20 @@ exports[`workers/repository/process/lookup/index .lookupUpdates() handles replac
     {
       "newName": "r",
       "newValue": "2.0.0",
+      "updateType": "replacement",
+    },
+  ],
+  "versioning": "npm",
+  "warnings": [],
+}
+`;
+
+exports[`workers/repository/process/lookup/index .lookupUpdates() handles replacements for invalid old values 1`] = `
+{
+  "updates": [
+    {
+      "newName": "r",
+      "newValue": "2.0",
       "updateType": "replacement",
     },
   ],

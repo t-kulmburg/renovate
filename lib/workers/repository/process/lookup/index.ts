@@ -317,10 +317,40 @@ export async function lookupUpdates(
 
         res.updates.push(update);
       }
-    } else if (currentValue) {
+    } else if (currentValue && config.updateType === 'replacement') {
       logger.debug(
-        `Dependency ${depName} has unsupported value ${currentValue}`
+        `Dependency ${depName} has unsupported - value ${currentValue}`
       );
+      const dependency = clone(await getPkgReleases(config));
+      if (!dependency) {
+        // If dependency lookup fails then warn and return
+        const warning: ValidationMessage = {
+          topic: depName,
+          message: `Failed to look up dependency ${depName}`,
+        };
+        logger.debug({ dependency: depName, packageFile }, warning.message);
+        // TODO: return warnings in own field
+        res.warnings.push(warning);
+        return res;
+      }
+      if (dependency.replacementName && dependency.replacementVersion) {
+        const rangeStrategy = getRangeStrategy(config);
+        logger.debug(
+          `Dependency replacement ${dependency.replacementName} -- ${dependency.replacementVersion}`
+        );
+        res.updates.push({
+          updateType: 'replacement',
+          newName: dependency.replacementName,
+          newValue: versioning.getNewValue({
+            // TODO #7154
+            currentValue: currentValue,
+            newVersion: dependency.replacementVersion,
+            rangeStrategy: rangeStrategy!,
+          })!,
+        });
+        return res;
+      }
+    } else if (currentValue) {
       if (!pinDigests && !currentDigest) {
         res.skipReason = 'invalid-value';
       } else {

@@ -317,10 +317,15 @@ export async function lookupUpdates(
 
         res.updates.push(update);
       }
-    } else if (currentValue && config.updateType === 'replacement') {
+    } else if (
+      is.string(currentValue) &&
+      config.replacementName &&
+      config.replacementVersion
+    ) {
       logger.debug(
         `Dependency ${depName} has unsupported - value ${currentValue}`
       );
+      config = mergeConfigConstraints(config);
       const dependency = clone(await getPkgReleases(config));
       if (!dependency) {
         // If dependency lookup fails then warn and return
@@ -349,6 +354,8 @@ export async function lookupUpdates(
           })!,
         });
         return res;
+      } else {
+        res.skipReason = 'invalid-value';
       }
     } else if (currentValue) {
       if (!pinDigests && !currentDigest) {

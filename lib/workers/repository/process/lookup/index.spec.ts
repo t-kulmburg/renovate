@@ -1377,6 +1377,8 @@ describe('workers/repository/process/lookup/index', () => {
       config.currentValue = 'alpine';
       config.depName = 'node';
       config.datasource = DockerDatasource.id;
+      config.replacementName = undefined;
+      config.replacementVersion = undefined;
       const res = await lookup.lookupUpdates(config);
       expect(res).toMatchSnapshot({ skipReason: 'invalid-value' });
     });
@@ -1719,7 +1721,6 @@ describe('workers/repository/process/lookup/index', () => {
       // This config is normally set when packageRules are applied
       config.replacementName = 'r';
       config.replacementVersion = '2.0.0';
-      config.updateType = 'replacement';
       config.datasource = NpmDatasource.id;
       config.packageFile = 'package.json';
       httpMock.scope('https://registry.npmjs.org').get('/x').reply(404);

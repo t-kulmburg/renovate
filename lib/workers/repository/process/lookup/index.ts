@@ -324,7 +324,7 @@ export async function lookupUpdates(
       config.replacementVersion
     ) {
       logger.debug(
-        `Dependency ${depName} has unsupported - value ${currentValue}`
+        `Dependency ${depName} has unsupported value ${currentValue}, but will be replaced`
       );
       config = mergeConfigConstraints(config);
       const dependency = clone(await getPkgReleases(config));
@@ -339,26 +339,26 @@ export async function lookupUpdates(
         res.warnings.push(warning);
         return res;
       }
-      if (dependency.replacementName && dependency.replacementVersion) {
-        const rangeStrategy = getRangeStrategy(config);
-        logger.debug(
-          `Dependency replacement ${dependency.replacementName} -- ${dependency.replacementVersion}`
-        );
-        res.updates.push({
-          updateType: 'replacement',
-          newName: dependency.replacementName,
-          newValue: versioning.getNewValue({
-            // TODO #7154
-            currentValue: currentValue,
-            newVersion: dependency.replacementVersion,
-            rangeStrategy: rangeStrategy!,
-          })!,
-        });
-        return res;
-      } else {
-        res.skipReason = 'invalid-value';
-      }
+      const rangeStrategy = getRangeStrategy(config);
+      logger.debug(
+        `Dependency replacement ${config.replacementName!} -- ${config.replacementVersion!}`
+      );
+      res.updates.push({
+        updateType: 'replacement',
+        newName: config.replacementName!,
+        newValue: versioning.getNewValue({
+          // TODO #7154
+          currentValue: currentValue,
+          newVersion: config.replacementVersion!,
+          rangeStrategy: rangeStrategy!,
+          isReplacement: true,
+        })!,
+      });
+      return res;
     } else if (currentValue) {
+      logger.debug(
+        `Dependency ${depName} has unsupported value ${currentValue}`
+      );
       if (!pinDigests && !currentDigest) {
         res.skipReason = 'invalid-value';
       } else {

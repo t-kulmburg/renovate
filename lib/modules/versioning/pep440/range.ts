@@ -98,12 +98,12 @@ export function getNewValue({
 }: NewValueConfig): string | null {
   let ranges: Range[];
   let updatedRange: (string | null)[];
-  if (rangeStrategy === 'pin' && !isReplacement) {
+  if (rangeStrategy === 'pin') {
     return '==' + newVersion;
   }
 
   // no symbol: accept only that specific version specified
-  if (currentValue === currentVersion || isReplacement) {
+  if (currentValue === currentVersion) {
     return newVersion;
   }
 
